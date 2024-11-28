@@ -15,6 +15,12 @@ except Exception as e:
 
 2.启动go.py开始爬取
 
+安装所需的模块
+
+```
+python -m pip install -r req.txt
+```
+
 ```
 usage: go.py [-h] -n NAME [-s START] -e END [-c COOKIE]
 
