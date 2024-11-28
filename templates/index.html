@@ -1,0 +1,199 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="{{url_for('static',filename='/bootstrap/css/bootstrap.css')}}">
+        <script src="{{url_for('static',filename='/bootstrap/js/bootstrap.js')}}"></script>
+        <script src="{{url_for('static',filename='/echarts-5.5.1/echarts-5.5.1/dist/echarts.js')}}"></script>
+        <script src="{{url_for('static',filename='/jquery/jquery.js')}}"></script>
+        <title>结果</title>
+    </head>
+    <body>
+        <div class="container mt-5" name="options">
+            <h2 class="mb-4">结果查询</h2>
+            <form method="get">
+                <div class="mb-3">
+                    <label for="dynamicSelect" class="form-label">选择需要找的吧</label>
+                    <select id="dynamicSelect" class="form-select" name="query">
+                        <option value="{{Tname}}">最近选择  :  {{Tname}}</option>
+                        {% for i in Ba%}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="mb-3" name="show">
+                    <label for="dynamicSelect" class="form-label">选择查询哪个IP的帖子</label>
+                    <select id="dynamicSelect" class="form-select" name="ip">
+                        <option value="{{ip}}">最近选择  :  {{ip}}</option>
+                        {% for i in ipWhere%}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">查询数据</button>
+                <button type="submit" formaction="/count" class="btn btn-primary">查询饼状图</button>
+                </form>
+        <div class="container-xxl" name="list" >
+
+        <table class="table table-bordered">
+            <thead>
+              <tr class="table-primary">
+                <th scope="col">网址</th>
+                <th scope="col">IP属地</th>
+                <th scope="col">标题</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for i in Column%}
+                <tr>
+                    <td><a href="{{i[0]}}">{{i[0]}}</a></td>
+                    <td>{{i[2]}}</td>
+                    <td>{{i[1]}}</td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+        <nav aria-label="Page navigation" style="margin-top: 30px;" >
+            <form action="/" method="get">
+            <input type="hidden" name="query" value="{{Tname}}">
+            <input type="hidden" name="ip" value="{{ip}}">
+            <input type="text" name="page" value="" placeholder="输入页数跳转">
+            <button type="submit" class="btn btn-primary">跳转</button>
+            </form>
+            <ul class="pagination"></ul>
+        </nav>
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+                let total = {{allPage}}; // 数据总条数
+                let PageIndex = {{currentPage}};// 当前页
+                let PageSize = 70; //一页显示70条
+                let pageHtml = $('.pagination'); // 分页栏
+                let totalPage = Math.ceil(total / PageSize); // 获取到总页数
+                function setPages() {
+                    let pageBtnPrev = "<li class='page-item btnPrev'><a class='page-link' aria-label='Previous'><span aria-hidden='true'>«</span></a ></li>";
+                    let pageBtnNext = "<li class='page-item btnNext'><a class='page-link' aria-label='Next'><span aria-hidden='true'>»</span></a></li>";
+                    let pageTips = "<div style='line-height:38px'>" +"当前在第"+ PageIndex + "页 " + "共"  + totalPage + "页 "  + total + "条数据" + "</div > ";
+                    pageHtml.append(pageBtnPrev); // 添加左按钮
+                    // 第一页
+                    let firstPage = $("<li class='page-item' pagenumber=1><a class='page-link'>1</a ></li> ");
+                    // 最后一页
+                    let lastPage = $("<li class='page-item' pagenumber='" + totalPage + "'><a class='page-link' >" + totalPage + "</a ></li>");
+                    // 左省略号
+                    let leftOmitPage = $("<li class='page-item' id='leftOmit'><a class='page-link'>...</a></li>");
+                    // 右省略号
+                    let rightOmitPage = $("<li class='page-item' id='rightOmit'><a class='page-link'>...</a></li>");
+                    // 左省略号图标
+                    let leftOmitIcon = $("<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-chevron-left' viewBox='0 0 16 16'>" +
+                        "<path fill-rule='evenodd' d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+                    // 右省略号图标
+                    let rightOmitIcon = $("<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-chevron-right' viewBox='0 0 16 16'>" +
+                        "<path fill-rule='evenodd' d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+         
+                    // 总页数小于等于10页全部显示
+                    if (totalPage <= 10) {
+                        for (let i = 1; i <= totalPage; i++) {
+                            pageHtml.append($("<li class='page-item' pagenumber=" + i + "><a class='page-link' href='/?query={{Tname}}&ip={{ip}}&page="+i+"'>" + i + "</a ></li> "));
+                        }
+         
+                    } else if (PageIndex <= 8) {  //总页数大于10且当前页远离总页数
+                        for (let i = 1; i <= 9; i++) {
+                            pageHtml.append($("<li class='page-item' pagenumber=" + i + "><a class='page-link' href='/?query={{Tname}}&ip={{ip}}&page="+i+"'>" + i + "</a ></li> "));
+                        }
+                        pageHtml.append(rightOmitPage);
+                        pageHtml.append(lastPage);
+                        //总页数大于10且当前页接近总页数
+                    } else if (PageIndex > totalPage - 7) {
+                        pageHtml.append(firstPage);
+                        pageHtml.append(leftOmitPage);
+                        for (let i = totalPage - 8; i <= totalPage; i++) {
+                            pageHtml.append($("<li class='page-item' pagenumber=" + i + "><a class='page-link' href='/?query={{Tname}}&ip={{ip}}&page="+i+"'>" + i + "</a ></li> "));
+                        }
+                        //除开上面两个情况 当前页在中间
+                    } else {
+                        pageHtml.append(firstPage);
+                        pageHtml.append(leftOmitPage);
+                        for (let i = PageIndex - 3; i <= PageIndex + 3; i++) {
+                            pageHtml.append($("<li class='page-item' pagenumber=" + i + "><a class='page-link' href='/?query={{Tname}}&ip={{ip}}&page="+i+"'>" + i + "</a ></li> "));
+                        }
+                        pageHtml.append(rightOmitPage);
+                        pageHtml.append(lastPage);
+                    }
+         
+                    $(".pagination li[pagenumber='" + PageIndex + "']").addClass('active');
+                    pageHtml.append(pageBtnNext); // 添加右按钮
+                    pageHtml.append(pageTips); // 添加右下角items提示栏
+         
+                    
+                    /* 点击页码按钮进行翻页 */
+                    /*
+                    $(".pagination li[pagenumber]").on('click', function () { // 页数跳转
+                        PageIndex = Number($(this).text()); // 当前页
+                        $('input[name=pagenumber]').attr('value', PageIndex); // 当前第几页
+                        $(this).siblings('li').removeClass('active');
+                        $(this).addClass('active');
+                        pageHtml.empty();
+                        setPages();
+                    })
+                        */
+                    
+         
+                    /* 点击按钮进行翻页 */
+                    $(".btnPrev").on('click', function () { // 向左翻页
+                        if (PageIndex > 1) {
+                            PageIndex--;
+                            window.location.href = "/?query={{Tname}}&ip={{ip}}&page="+PageIndex
+                            pageHtml.empty();
+                            setPages();
+                        }
+                        $(this).addClass('disabled');
+                    })
+                    $(".btnNext").on('click', function () { // 向右翻页
+                        if (PageIndex < totalPage) {
+                            PageIndex++;
+                            window.location.href = "/?query={{Tname}}&ip={{ip}}&page="+PageIndex
+                            pageHtml.empty();
+                            setPages();
+                        }
+                        $(this).addClass('disabled');
+                    })
+         
+                    /* 点击左省略号向左翻页 */
+                    $('#leftOmit').click(function () {
+                        if (PageIndex > 10) {
+                            PageIndex -= 10;
+                            pageHtml.empty();
+                            setPages();
+                        }
+                    })
+                    /* 点击右省略号向右翻页 */
+                    $('#rightOmit').click(function () {
+                        if (PageIndex <= totalPage - 10) {
+                            PageIndex += 10;
+                            pageHtml.empty();
+                            setPages();
+                        }
+                    })
+                    /* 左省略号移入移出 */
+                    $('#leftOmit').mouseenter(function () {
+                        $(this).children().html(leftOmitIcon);
+                    })
+                    $('#leftOmit').mouseleave(function () {
+                        $(this).children().html('...');
+                    })
+                    /* 右省略号移入移出 */
+                    $('#rightOmit').mouseenter(function () {
+                        $(this).children().html(rightOmitIcon);
+                    })
+                    $('#rightOmit').mouseleave(function () {
+                        $(this).children().html('...');
+                    })
+                }
+         
+                setPages();
+            })
+        </script>
+    </body>
+</html>

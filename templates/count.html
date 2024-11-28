@@ -1,0 +1,110 @@
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=pie-legend
+-->
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+  <meta charset="utf-8">
+  <script src="{{url_for('static',filename='/echarts-5.5.1/echarts-5.5.1/dist/echarts.js')}}"></script>
+  <link rel="stylesheet" href="{{url_for('static',filename='/bootstrap/css/bootstrap.css')}}">
+    <script src="{{url_for('static',filename='/bootstrap/js/bootstrap.js')}}"></script>
+  
+</head>
+<body style="height: 100%; margin: 0">
+  <div id="ip" style="height: 95%"></div>
+  <button onclick="window.location.href='/'" type="button" class="btn btn-primary">回首页</button>
+  <!-- Uncomment this line if you want to dataTool extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/extension/dataTool.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use gl extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-gl/2/files/dist/echarts-gl.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-stat extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-stat/latest/files/dist/ecStat.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to echarts-graph-modularity extension
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts-graph-modularity/2/files/dist/echarts-graph-modularity.min.js"></script>
+  -->
+  <!-- Uncomment this line if you want to use map
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/4.9.0/files/map/js/world.js"></script>
+  -->
+  <!-- Uncomment these two lines if you want to use bmap extension
+  <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=YOUR_API_KEY"></script>
+  <script type="text/javascript" src="https://registry.npmmirror.com/echarts/5.5.1/files/dist/extension/bmap.min.js"></script>
+  -->
+
+  <script type="text/javascript">
+    var dom = document.getElementById('ip');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    
+    var option;
+
+    var nameDict = {
+        {% for key,value in nameDict.items()%}
+        "{{key}}" : {{value}},
+        {%endfor%}
+    }
+    const data = genData(nameDict);
+option = {
+  title: {
+    text: '{{Tname}}吧IP分布统计',
+    left: 'center'
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b} : {c} ({d}%)'
+  },
+  legend: {
+    type: 'scroll',
+    orient: 'vertical',
+    right: 10,
+    top: 20,
+    bottom: 20,
+    data: data.legendData
+  },
+  series: [
+    {
+      name: 'IP属地',
+      type: 'pie',
+      radius: '55%',
+      center: ['40%', '50%'],
+      data: data.seriesData,
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }
+  ]
+};
+function genData(nameDict) {
+  const legendData = [];
+  const seriesData = [];
+  for (var key in nameDict) {
+    legendData.push(key);
+    seriesData.push({
+      name: key,
+      value: nameDict[key]
+    });
+  }
+  return {
+    legendData: legendData,
+    seriesData: seriesData
+  };
+}
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+  </script>
+</body>
+</html>
+
