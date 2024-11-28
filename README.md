@@ -1,3 +1,5 @@
+主要由Flask+Mysql+bootstrap搭建的爬虫数据查询应用
+
 # Usage
 
 1.在db.py配置好数据库连接
