@@ -1,5 +1,9 @@
 import pymysql
 import sys
+import threading
+
+lock=threading.Lock()
+
 try:
     db = pymysql.connect(host="127.0.0.1",port=3306,user="root",passwd="rootroot",database="tieba")
     cursor = db.cursor()
@@ -20,9 +24,13 @@ def createT(Tname):
 def insertC(Tname,content):
     sql = f'''insert into {Tname}(url,title,ip) values('{content[0]}','{content[1]}','{content[2]}');'''
     try:
+       lock.acquire()
        cursor.execute(sql)
     except Exception as e:
-        print("存在重复的url,此条不会重复存入数据库")
+        print("可能因为URL已经存在,不会重复插入")
+        print(e)
+    finally:
+        lock.release()
 
 def deleteT(Tname):
     pass
