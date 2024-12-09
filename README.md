@@ -22,7 +22,7 @@ python -m pip install -r req.txt
 ```
 
 ```
-usage: go.py [-h] -n NAME [-s START] -e END [-c COOKIE]
+usage: go.py [-h] -n NAME [-s START] -e END [-t THREADS] [-c COOKIE]
 
 BaiduTieba-url-ip-title
 
@@ -32,14 +32,16 @@ optional arguments:
   -s START, --start START
                         从这个吧的主页的第几页开始，默认为第一页
   -e END, --end END     结束页
+  -t THREADS, --threads THREADS
+                        线程数量,允许1-10,默认5
   -c COOKIE, --cookie COOKIE
-                        输入cookie，注意不要出现特殊字符，如一些url编码字符，用单引号包裹，默认从cook.txt读取
+                        输入cookie,注意不要出现特殊字符,如一些url编码字符,用单引号包裹,默认从cook.txt读取
 ```
 
 eg: 爬取钓鱼吧前3页的数据
 
 ```
-python go.py -n 钓鱼 -s 1 -e 3
+python go.py -n 钓鱼 -s 1 -e 3 -t 10
 ```
 
 3.启动本地web服务查看数据
